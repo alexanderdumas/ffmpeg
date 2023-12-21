@@ -6,9 +6,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-
 #include <string>
 #include <vector>
+
+//rk相关的库，需要使用rk的头文件和so。去rockchip上获取头文件和so
 
 #include "mpp_buffer.h"
 #include "mpp_frame.h"
@@ -17,26 +18,23 @@
 #include "vpu.h"
 #include "rk_type.h"
 
-#define ENV_BUF_SIZE_LINUX  1024
-
-
 #define MPP_ALIGN(x, a)         (((x)+(a)-1)&~((a)-1))
 
 typedef enum {
-    MPP_CODEC_DEC,  /**< decoder */
-    MPP_CODEC_ENC,  /**< encoder */
+    MPP_CODEC_DEC, 
+    MPP_CODEC_ENC, 
 } MppCodecType;
 
 typedef enum {
-    MPP_CODEC_SIMPLE,  /**< simple */
-    MPP_CODEC_ADVANCE,  /**< advance */
+    MPP_CODEC_SIMPLE, 
+    MPP_CODEC_ADVANCE, 
 } MppEasyType;
 
 
-class MppCodec {
+class RKMppCodec {
 
 private:
-    //common 
+    
     RK_U32 _width;
     RK_U32 _height;
     RK_U32 _hor_stride;
@@ -52,14 +50,9 @@ private:
     size_t _frame_size;
     size_t _mdinfo_size;
 
-
-    //encode param
     MppEncCfg _enc_cfg;
-
-    //decode param
     MppDecCfg _dec_cfg;
 
-    //all need
     MppCtx _ctx;
     MppApi *_mpi;
 
@@ -84,14 +77,14 @@ private:
     MPP_RET DecReadImg(void *buf,void *input,size_t len);
     MPP_RET DumpToFrame(MppFrame frame,std::vector<unsigned char> & output);
 public:
-    MppCodec();
-    ~MppCodec();
+    RKMppCodec();
+    ~RKMppCodec();
 
-    MppCodec(const MppCodec &) = delete;
-    MppCodec(MppCodec&&) = delete;
+    RKMppCodec(const RKMppCodec &) = delete;
+    RKMppCodec(RKMppCodec&&) = delete;
 
-    MppCodec& operator=(const MppCodec &) = delete;
-    MppCodec& operator=(MppCodec&&) = delete;
+    RKMppCodec& operator=(const RKMppCodec &) = delete;
+    RKMppCodec& operator=(RKMppCodec&&) = delete;
 
     void Init(MppCodecType codec_type, RK_U32 width, RK_U32 height,
             MppFrameFormat format,  MppCodingType code_type,
