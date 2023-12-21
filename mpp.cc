@@ -1,6 +1,6 @@
 #include "mpp.h"
 
-MppCodec::MppCodec() : _width(0),_height(0),_hor_stride(0),
+RKMppCodec::RKMppCodec() : _width(0),_height(0),_hor_stride(0),
             _ver_stride(0),_rc_mode(MPP_ENC_RC_MODE_FIXQP),
             _frame_num(0),
             _format(MPP_FMT_BGR888),_type(MPP_VIDEO_CodingMJPEG),
@@ -16,7 +16,7 @@ MppCodec::MppCodec() : _width(0),_height(0),_hor_stride(0),
     
 }
 
-MppCodec::~MppCodec() 
+RKMppCodec::~RKMppCodec() 
 {
     if (_ctx) {
         mpp_destroy(_ctx);
@@ -58,15 +58,14 @@ MppCodec::~MppCodec()
     }
 }
 
-RK_S32 MppCodec::EncDefaultStride(RK_U32 width, MppFrameFormat fmt) {
+RK_S32 RKMppCodec::EncDefaultStride(RK_U32 width, MppFrameFormat fmt) {
     RK_S32 stride = 0;
     switch (fmt & MPP_FRAME_FMT_MASK) {
-        case MPP_FMT_YUV420SP : {//YUV NV12
+        case MPP_FMT_YUV420SP : {
             stride = MPP_ALIGN(width, 8);
         } break;
         case MPP_FMT_RGB888 :
         case MPP_FMT_BGR888 : {
-            /* NOTE: for vepu limitation */
             stride = MPP_ALIGN(width, 8) * 3;
         } break;
         default : {
@@ -77,7 +76,7 @@ RK_S32 MppCodec::EncDefaultStride(RK_U32 width, MppFrameFormat fmt) {
     return stride;
 }
 
-size_t MppCodec::GetFrameSize(MppFrameFormat format, RK_U32 hor_stride, RK_U32 ver_stride) {
+size_t RKMppCodec::GetFrameSize(MppFrameFormat format, RK_U32 hor_stride, RK_U32 ver_stride) {
     size_t frame_size = 0;
     switch (format & MPP_FRAME_FMT_MASK) {
         case MPP_FMT_YUV420SP:{
@@ -87,7 +86,6 @@ size_t MppCodec::GetFrameSize(MppFrameFormat format, RK_U32 hor_stride, RK_U32 v
         case MPP_FMT_BGR888 : {
             frame_size = MPP_ALIGN(hor_stride, 64) * MPP_ALIGN(ver_stride, 64);
         } break;
-
         default: {
             frame_size = MPP_ALIGN(hor_stride, 64) * MPP_ALIGN(ver_stride, 64) * 4;
         } break;
@@ -95,7 +93,7 @@ size_t MppCodec::GetFrameSize(MppFrameFormat format, RK_U32 hor_stride, RK_U32 v
     return frame_size;
 }
 
-size_t MppCodec::GetMediaSize(MppCodingType code_type, RK_U32 hor_stride, RK_U32 ver_stride) {
+size_t RKMppCodec::GetMediaSize(MppCodingType code_type, RK_U32 hor_stride, RK_U32 ver_stride) {
     size_t mdinfo_size = 0;
     mdinfo_size  = (MPP_VIDEO_CodingHEVC == code_type) ?
                       (MPP_ALIGN(hor_stride, 32) >> 5) *
@@ -105,7 +103,7 @@ size_t MppCodec::GetMediaSize(MppCodingType code_type, RK_U32 hor_stride, RK_U32
     return mdinfo_size;
 }
 
-size_t MppCodec::GetHeadSize(MppFrameFormat format, RK_U32 width, RK_U32 height) {
+size_t RKMppCodec::GetHeadSize(MppFrameFormat format, RK_U32 width, RK_U32 height) {
     size_t header_size = 0;
     if (MPP_FRAME_FMT_IS_FBC(format)) {
         if ((format & MPP_FRAME_FBC_MASK) == MPP_FRAME_FBC_AFBC_V1) {
@@ -120,7 +118,7 @@ size_t MppCodec::GetHeadSize(MppFrameFormat format, RK_U32 width, RK_U32 height)
     return header_size;
 }
 
-MPP_RET MppCodec::EncSetCfg() {
+MPP_RET RKMppCodec::EncSetCfg() {
 
     mpp_enc_cfg_set_s32(_enc_cfg, "prep:width", _width);
     mpp_enc_cfg_set_s32(_enc_cfg, "prep:height", _height);
@@ -154,7 +152,7 @@ MPP_RET MppCodec::EncSetCfg() {
     return ret;
 }
 
-void MppCodec::Init (MppCodecType codec_type, RK_U32 width, RK_U32 height,
+void RKMppCodec::Init (MppCodecType codec_type, RK_U32 width, RK_U32 height,
             MppFrameFormat format,  MppCodingType code_type,
             RK_S32 need_split, MppEasyType easy_type ) {
     MPP_RET ret = MPP_OK;
@@ -318,7 +316,7 @@ void MppCodec::Init (MppCodecType codec_type, RK_U32 width, RK_U32 height,
     }
 }
 
-MPP_RET MppCodec::EncReadImg(void *buf, void *input, size_t len, RK_U32 width, RK_U32 height,
+MPP_RET RKMppCodec::EncReadImg(void *buf, void *input, size_t len, RK_U32 width, RK_U32 height,
                RK_U32 hor_stride, RK_U32 ver_stride, MppFrameFormat format) {
     MPP_RET ret = MPP_OK;
     RK_U32 read_size;
@@ -344,7 +342,7 @@ MPP_RET MppCodec::EncReadImg(void *buf, void *input, size_t len, RK_U32 width, R
     return ret;
 }
 
-MPP_RET MppCodec::Encode(void *input, size_t len, std::vector<unsigned char> & output) {
+MPP_RET RKMppCodec::Encode(void *input, size_t len, std::vector<unsigned char> & output) {
     MPP_RET ret = MPP_OK;
     MppMeta meta = NULL;
     _frame = NULL;
@@ -399,12 +397,12 @@ MPP_RET MppCodec::Encode(void *input, size_t len, std::vector<unsigned char> & o
     return ret;
 }
 
-MPP_RET MppCodec::DecReadImg(void *buf,void *input,size_t len) {
+MPP_RET RKMppCodec::DecReadImg(void *buf,void *input,size_t len) {
     MPP_RET ret = MPP_OK;
     memcpy(buf, input, len);
     return ret;
 }
-MPP_RET MppCodec::DumpToFrame(MppFrame frame,std::vector<unsigned char> & output) {
+MPP_RET RKMppCodec::DumpToFrame(MppFrame frame,std::vector<unsigned char> & output) {
     MPP_RET ret = MPP_OK;
     RK_U32 width    = 0;
     RK_U32 height   = 0;
@@ -459,7 +457,7 @@ MPP_RET MppCodec::DumpToFrame(MppFrame frame,std::vector<unsigned char> & output
     return ret;
 }
 
-MPP_RET MppCodec::Decode(void *input, size_t len, std::vector<unsigned char> & output) {
+MPP_RET RKMppCodec::Decode(void *input, size_t len, std::vector<unsigned char> & output) {
     MPP_RET ret = MPP_OK;
     RK_U32 pkt_done = 0;
     RK_U32 frm_eos = 0;
@@ -556,7 +554,7 @@ MPP_RET MppCodec::Decode(void *input, size_t len, std::vector<unsigned char> & o
     return ret;
 }
 
-MPP_RET MppCodec::ReSet() {
+MPP_RET RKMppCodec::ReSet() {
     MPP_RET ret = MPP_OK;
     ret = _mpi->reset(_ctx);
     if (ret != MPP_OK) {
