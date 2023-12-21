@@ -1,4 +1,6 @@
-#include "
+#include "mpp.h"
+
+//主框架流程
 int main()
 {
     AVFormatContext *pFormatCtx = NULL;
@@ -47,10 +49,7 @@ int main()
 
     av_packet = (AVPacket *)av_malloc(sizeof(AVPacket)); // 申请空间，存放的每一帧数据 （h264、h265）
 
-
-    //初始化MPP
-    //Init decoder
-    MppCodec decoder;
+    RKMppCodec decoder;
     decoder.Init(MPP_CODEC_DEC, 1280, 720, MPP_FMT_YUV420SP, MPP_VIDEO_CodingMJPEG);
     std::vector<uchar> out_buff;
 
