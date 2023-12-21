@@ -9,7 +9,10 @@
 #include <string>
 #include <vector>
 
-//rk相关的库，需要使用rk的头文件和so。去rockchip上获取头文件和so
+/*
+rk相关的库，需要使用rk的头文件和so。去rockchip上获取头文件和so
+本次只提供源码框架，具体调试需要包含rk3588相关的头文件和so，可以去github上获取
+*/
 
 #include "mpp_buffer.h"
 #include "mpp_frame.h"
